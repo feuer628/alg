@@ -18,7 +18,7 @@ public class WebServiceCPUImpl implements WebServiceCPU {
     private final static int IMAGE_HEIGHT = 140;
     private final static int FONT_SIZE = 150;
     private final static int TEXT_COORD_X = 0;
-    private final static int TEXT_COORD_Y = 140;
+    private final static int TEXT_COORD_Y = 125;
 
     @Override
     public byte[] getCPULoad() throws MalformedObjectNameException, ReflectionException,
