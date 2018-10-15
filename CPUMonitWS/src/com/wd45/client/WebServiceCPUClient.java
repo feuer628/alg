@@ -20,8 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class WebServiceCPUClient {
 
     public static void main (String arg[])
-            throws IOException, MalformedObjectNameException,
-            InstanceNotFoundException, ReflectionException, InterruptedException {
+            throws IOException{
         URL url = new URL("http://localhost:8081/cpu?wsdl");
         QName qname = new QName("http://ws.wd45.com/", "WebServiceCPUImplService");
         Service service = Service.create(url, qname);

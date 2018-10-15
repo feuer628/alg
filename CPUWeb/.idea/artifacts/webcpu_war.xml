@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="webcpu:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="loadcpu.war">
+      <element id="artifact" artifact-name="webcpu:war exploded" />
+    </root>
+  </artifact>
+</component>
