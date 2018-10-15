@@ -1,15 +1,11 @@
 package com.wd45.client;
 import com.wd45.ws.WebServiceCPU;
 
-import javax.imageio.ImageIO;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
 import javax.xml.namespace.QName;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,6 +34,8 @@ public class WebServiceCPUClient {
             } catch (InstanceNotFoundException e) {
 
             } catch (ReflectionException e) {
+
+            } catch (Exception e) {
 
             }
 

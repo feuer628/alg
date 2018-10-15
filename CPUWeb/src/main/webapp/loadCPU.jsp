@@ -4,8 +4,9 @@
         <h2>
             Load CPU Percent
         </h2>
-        <h4>
+        <p>
             <img alt="no img" src="<%=request.getAttribute ("loadCPUImj")%>"/>
-        </h4>
+        </p>
+        <h4><%=request.getAttribute ("alarm")%></h4>
     </body>
 </html>

@@ -1,5 +1,6 @@
 package com.wd45.servlet;
 
+import com.wd45.rabbitmq.RabbitMQConsumer;
 import com.wd45.ws.WebServiceCPU;
 import sun.misc.BASE64Encoder;
 import javax.servlet.ServletException;
@@ -9,6 +10,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 @WebServlet("/loadCPU")
 public class CPUServlet extends HttpServlet {
@@ -27,9 +29,20 @@ public class CPUServlet extends HttpServlet {
         StringBuilder imageString = new StringBuilder();
         imageString.append("data:image/jpg;base64,");
         imageString.append(base64Encoder.encode(loadCPU));
+/*
+        ArrayList<byte[]> mes = null;
+        try {
+            mes = RabbitMQConsumer.getMessage();
+        } catch (Exception e) {
 
+        }
+        String alarm = new String(mes.get(mes.size()));
+*/
         httpServletRequest.setAttribute("loadCPUImj", imageString.toString());
+        //httpServletRequest.setAttribute("alarm", alarm);
         httpServletResponse.setContentType("image/jpeg");
+
+
 
         httpServletRequest.getRequestDispatcher("/loadCPU.jsp").forward(httpServletRequest, httpServletResponse);
 
