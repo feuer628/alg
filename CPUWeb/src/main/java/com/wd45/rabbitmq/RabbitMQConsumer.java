@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 
 public final class RabbitMQConsumer {
-    public static void main (String... arg) throws Exception {
+    public static String getMessages () throws Exception {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername("guest");
@@ -33,18 +33,25 @@ public final class RabbitMQConsumer {
         QueueingConsumer consumer = new QueueingConsumer(channel);
         channel.basicConsume(queueName, noAck, consumer);
         boolean runInfinite = true;
+        StringBuffer mes = new StringBuffer();
         while (runInfinite) {
-            QueueingConsumer.Delivery delivery;
+            QueueingConsumer.Delivery delivery = null;
             try {
-                delivery = consumer.nextDelivery();
+                delivery = consumer.nextDelivery(50);
             } catch (InterruptedException ie) {
-                continue;
+                break;
             }
-            System.out.println("Message received"
-                    + new String(delivery.getBody()));
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+            if (delivery == null){
+                break;
+            }
+
+            mes.append(new String(delivery.getBody())+"\r\n");
+            //System.out.println("Message received  " + new String(delivery.getBody()));
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
         }
         channel.close();
         conn.close();
+
+        return mes.toString();
     }
 }
