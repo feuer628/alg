@@ -5,12 +5,14 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 
-import java.util.ArrayList;
+import java.io.IOException;
+
+import java.util.concurrent.TimeoutException;
 
 
-public final class RabbitMQConsumer {
-    public static void main (String... arg) throws Exception {
+public  class RabbitMQConsumer  implements Runnable{
 
+    public  void run ()  {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername("guest");
         factory.setPassword("guest");
@@ -18,33 +20,49 @@ public final class RabbitMQConsumer {
         factory.setHost("127.0.0.1");
         factory.setPort(5672);
 
-        Connection conn = factory.newConnection();
+        Connection conn = null;
+        try {
+            conn = factory.newConnection();
+        } catch (Exception ex) {return;}
 
-        Channel channel = conn.createChannel();
         String exchangeName = "exchangeName";
         String queueName = "queueName";
         String routingKey = "routeKey";
 
+        Channel channel = null;
+        QueueingConsumer consumer = null;
         boolean durable = true;
-        channel.exchangeDeclare(exchangeName, "direct", durable);
-        channel.queueDeclare(queueName, durable,false,false,null);
-        channel.queueBind(queueName, exchangeName, routingKey);
-        boolean noAck = false;
-        QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName, noAck, consumer);
+        try {
+            channel = conn.createChannel();
+            channel.exchangeDeclare(exchangeName, "direct", durable);
+            channel.queueDeclare(queueName, durable,false,false,null);
+            channel.queueBind(queueName, exchangeName, routingKey);
+            consumer = new QueueingConsumer(channel);
+            channel.basicConsume(queueName, false, consumer);
+        } catch (IOException e) {
+
+        }
+
         boolean runInfinite = true;
         while (runInfinite) {
-            QueueingConsumer.Delivery delivery;
+            QueueingConsumer.Delivery delivery ;
             try {
                 delivery = consumer.nextDelivery();
+                new MessageThread(channel,
+                        new String(delivery.getBody()),
+                        delivery.getEnvelope().getDeliveryTag()
+                ).start();
             } catch (InterruptedException ie) {
-                continue;
+                break;
             }
-            System.out.println("Message received"
-                    + new String(delivery.getBody()));
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         }
-        channel.close();
-        conn.close();
+        try {
+            channel.close();
+            conn.close();
+        } catch (IOException e) {
+
+        } catch (TimeoutException e) {
+
+        }
     }
 }

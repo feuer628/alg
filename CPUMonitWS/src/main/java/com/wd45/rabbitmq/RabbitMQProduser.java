@@ -16,7 +16,12 @@ public final class RabbitMQProduser {
         factory.setHost("127.0.0.1");
         factory.setPort(5672);
 
-        Connection conn = factory.newConnection();
+        Connection conn = null;
+        try {
+            conn = factory.newConnection();
+        }catch (Exception ex){
+            return;
+        }
 
         Channel channel = conn.createChannel();
         String exchangeName = "exchangeName";

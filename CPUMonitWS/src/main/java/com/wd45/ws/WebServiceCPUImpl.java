@@ -9,7 +9,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
+import java.util.Date;
 import javax.management.*;
+import javax.xml.crypto.Data;
 
 @WebService(endpointInterface = "com.wd45.ws.WebServiceCPU")
 public class WebServiceCPUImpl implements WebServiceCPU {
@@ -19,7 +21,7 @@ public class WebServiceCPUImpl implements WebServiceCPU {
     private final static int FONT_SIZE = 150;
     private final static int TEXT_COORD_X = 0;
     private final static int TEXT_COORD_Y = 125;
-    private final static int CPU_OVERLOAD = 50;
+    private final static int CPU_FREQ = 50;
 
     @Override
     public byte[] getCPULoad() throws Exception {
@@ -32,6 +34,7 @@ public class WebServiceCPUImpl implements WebServiceCPU {
         double cpuLoad = (double)((Attribute)attrs.get(0)).getValue();
         int cpuLoadPercent = (int)(cpuLoad * 100);
 
+        // TODO MJPEG
         BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         graphics.setFont(new Font("SansSerif", Font.PLAIN, FONT_SIZE));
@@ -44,8 +47,10 @@ public class WebServiceCPUImpl implements WebServiceCPU {
         outputStream.close();
 
 
-        if (cpuLoadPercent >= CPU_OVERLOAD){
-            RabbitMQProduser.setMessage(String.format("Alarm! CPU overload : %d",cpuLoadPercent));
+        if (cpuLoadPercent >= CPU_FREQ){
+            Date date = new Date();
+            RabbitMQProduser.setMessage(
+                    String.format("CPU frequency : %d, date %s",cpuLoadPercent, date.toString()));
         }
 
         return  Base64.decode(base64String);

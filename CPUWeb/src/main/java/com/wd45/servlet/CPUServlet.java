@@ -1,53 +1,39 @@
 package com.wd45.servlet;
-
+import com.wd45.rabbitmq.Message;
 import com.wd45.rabbitmq.RabbitMQConsumer;
-import com.wd45.ws.WebServiceCPU;
-import sun.misc.BASE64Encoder;
+import com.wd45.ws.AnswerWS;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/loadCPU")
 public class CPUServlet extends HttpServlet {
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException, ServletException {
 
-        URL url = new URL("http://localhost:8081/cpu?wsdl");
-        QName qname = new QName("http://ws.wd45.com/", "WebServiceCPUImplService");
-        Service service = Service.create(url, qname);
-        httpServletResponse.addHeader("Refresh", "1");
-        WebServiceCPU webServiceCPU = service.getPort(WebServiceCPU.class);
-        byte[] loadCPU = webServiceCPU.getCPULoad();
-        
+        AnswerWS answerWS = new AnswerWS();
 
-        BASE64Encoder base64Encoder = new BASE64Encoder();
-        StringBuilder imageString = new StringBuilder();
-        imageString.append("data:image/jpg;base64,");
-        imageString.append(base64Encoder.encode(loadCPU));
-/*
-        ArrayList<byte[]> mes = null;
-        try {
-            mes = RabbitMQConsumer.getMessage();
-        } catch (Exception e) {
+        RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer();
+        Thread thread = new Thread(rabbitMQConsumer);
+        thread.setDaemon(true);
+        thread.start();
 
+        String action = httpServletRequest.getParameter("action");
+
+        if(action == null ){
+            httpServletRequest.setAttribute("loadCPUImj", answerWS.getBytesToString());
+            httpServletResponse.setContentType("image/jpeg");
+            httpServletRequest.getRequestDispatcher("/loadCPU.jsp").forward(httpServletRequest, httpServletResponse);
         }
-        String alarm = new String(mes.get(mes.size()));
-*/
-        httpServletRequest.setAttribute("loadCPUImj", imageString.toString());
-        //httpServletRequest.setAttribute("alarm", alarm);
-        httpServletResponse.setContentType("image/jpeg");
-
-
-
-        httpServletRequest.getRequestDispatcher("/loadCPU.jsp").forward(httpServletRequest, httpServletResponse);
-
-
-        //httpServletResponse.getWriter().print(String.format("Load CPU : %d", loadCPU));
-
+        else if(action.equals("refresh")){
+            httpServletResponse.getWriter().write(answerWS.getBytesToString());
+        }
+        else if(action.equals("answerWS")){
+            httpServletResponse.getWriter().write(Message.getMessage());
+        }
     }
 }
