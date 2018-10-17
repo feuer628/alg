@@ -1,36 +1,48 @@
+<%--suppress ALL --%>
 <!DOCTYPE html>
-
-
-<%@page import="com.wd45.rabbitmq.RabbitMQConsumer"%>
 <html>
 <head>
-    <script type='text/javascript' src='css/jquery-1.11.2.min.js'></script>
+    <script type='text/javascript' src='js/jquery-1.11.2.min.js'></script>
 </head>
 
     <body>
-        <h2 id="idd">
+        <h2>
             Load CPU Percent
         </h2>
 
-        <div id = "content">
-            <img alt="no img" src="<%=request.getAttribute("loadCPUImj")%>"/>
-        </div>
+        <div>
+            <img id = "content" alt="no img" src="<%=request.getAttribute("loadCPUImj")%>"/>
+            <br>
 
-        <h4><%=RabbitMQConsumer.getMessages()%></h4>
+        </div>
+        <div id = "answer">
+        </div>
+        <h4></h4>
     </body>
 </html>
 
 <script>
-    setInterval(function() {
+
+        setInterval(function () {
             $.ajax({
-                url : 'loadCPU',     // URL - сервлет
-                data : {                 // передаваемые сервлету данные
+                url: 'loadCPU',
+                data: {
+                    action: "refresh"
                 },
-                success : function(response) {
-                    // обработка ответа от сервера
-                    //$('#idd').text(response);
+                success: function (response) {
+                    $("#content").attr("src", response);
                 }
             });
-    }, 1000);
+
+            $.ajax({
+                url: 'loadCPU',
+                data: {
+                    action: "answerWS"
+                },
+                success: function (response) {
+                    $('<p>'+response+'</p>').appendTo('#answer');
+                }
+            });
+        }, 1000);
 
 </script>

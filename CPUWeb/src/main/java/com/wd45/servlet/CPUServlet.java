@@ -1,7 +1,10 @@
 package com.wd45.servlet;
 
 
+import com.google.common.collect.Iterables;
+import com.wd45.rabbitmq.RabbitMQConsumer;
 import com.wd45.ws.AnswerWS;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
@@ -16,16 +19,23 @@ public class CPUServlet extends HttpServlet {
 
         AnswerWS answerWS = new AnswerWS();
 
+        String action = httpServletRequest.getParameter("action");
 
-        httpServletRequest.setAttribute("loadCPUImj", answerWS.getByteToString() );
-        httpServletResponse.setContentType("image/jpeg");
+        if(action == null ){
+            httpServletRequest.setAttribute("loadCPUImj", answerWS.getBytesToString());
+            httpServletResponse.setContentType("image/jpeg");
+            httpServletRequest.getRequestDispatcher("/loadCPU.jsp").forward(httpServletRequest, httpServletResponse);
+        }
+        else if(action.equals("refresh")){
+            httpServletResponse.getWriter().write(answerWS.getBytesToString());
+        }
+        else if(action.equals("answerWS")){
+            try {
+                httpServletResponse.getWriter().write(
+                        Iterables.getLast(RabbitMQConsumer.getMessages()));
+            } catch (Exception e) {
 
-        //HttpServletResponse.getWriter().write(imageString.toString());
-
-        httpServletRequest.getRequestDispatcher("/loadCPU.jsp").forward(httpServletRequest, httpServletResponse);
-
-
-        //httpServletResponse.getWriter().print(String.format("Load CPU : %d", loadCPU));
-
+            }
+        }
     }
 }

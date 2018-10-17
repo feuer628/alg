@@ -31,7 +31,7 @@ public class AnswerWS {
         return  webServiceCPU.getCPULoad();
     }
 
-    public  String getByteToString() throws MalformedURLException {
+    public  String getBytesToString() throws MalformedURLException {
         BASE64Encoder base64Encoder = new BASE64Encoder();
         StringBuilder imageString = new StringBuilder();
         imageString.append("data:image/jpg;base64,");
