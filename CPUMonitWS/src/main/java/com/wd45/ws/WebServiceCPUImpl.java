@@ -48,9 +48,8 @@ public class WebServiceCPUImpl implements WebServiceCPU {
 
 
         if (cpuLoadPercent >= CPU_FREQ){
-            Date date = new Date();
             RabbitMQProduser.setMessage(
-                    String.format("CPU frequency : %d, date %s",cpuLoadPercent, date.toString()));
+                    String.format("CPU frequency : %d",cpuLoadPercent));
         }
 
         return  Base64.decode(base64String);

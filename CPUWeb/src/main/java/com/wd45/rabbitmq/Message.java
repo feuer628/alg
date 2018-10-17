@@ -2,11 +2,11 @@ package com.wd45.rabbitmq;
 
 public final class Message {
 
-    private static String message ="";
+    private static String message =null;
 
     public static String getMessage(){
         String buf = message;
-        message = "";
+        message = null;
         return buf;
     }
 

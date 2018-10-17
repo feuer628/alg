@@ -16,7 +16,7 @@ public final class RabbitMQProduser {
         factory.setHost("127.0.0.1");
         factory.setPort(5672);
 
-        Connection conn = null;
+        Connection conn;
         try {
             conn = factory.newConnection();
         }catch (Exception ex){
