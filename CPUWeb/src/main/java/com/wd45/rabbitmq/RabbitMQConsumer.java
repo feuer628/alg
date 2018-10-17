@@ -48,10 +48,7 @@ public  class RabbitMQConsumer  implements Runnable{
             QueueingConsumer.Delivery delivery ;
             try {
                 delivery = consumer.nextDelivery();
-                new MessageThread(channel,
-                        new String(delivery.getBody()),
-                        delivery.getEnvelope().getDeliveryTag()
-                ).start();
+                Message.setMessage(new String(delivery.getBody()));
             } catch (InterruptedException ie) {
                 break;
             }

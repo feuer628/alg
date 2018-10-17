@@ -18,6 +18,7 @@ public class CPUServlet extends HttpServlet {
         AnswerWS answerWS = new AnswerWS();
 
         RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer();
+
         Thread thread = new Thread(rabbitMQConsumer);
         thread.setDaemon(true);
         thread.start();
