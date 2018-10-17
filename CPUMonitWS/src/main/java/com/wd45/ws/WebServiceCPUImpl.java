@@ -34,6 +34,7 @@ public class WebServiceCPUImpl implements WebServiceCPU {
         double cpuLoad = (double)((Attribute)attrs.get(0)).getValue();
         int cpuLoadPercent = (int)(cpuLoad * 100);
 
+        // TODO MJPEG
         BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         graphics.setFont(new Font("SansSerif", Font.PLAIN, FONT_SIZE));

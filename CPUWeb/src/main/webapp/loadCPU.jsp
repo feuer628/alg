@@ -43,6 +43,6 @@
                     $('<p>'+response+'</p>').appendTo('#answer');
                 }
             });
-        }, 1000);
+        }, 500);
 
 </script>

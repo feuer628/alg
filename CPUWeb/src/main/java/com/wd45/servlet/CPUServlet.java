@@ -1,7 +1,5 @@
 package com.wd45.servlet;
-
-
-import com.google.common.collect.Iterables;
+import com.wd45.rabbitmq.Message;
 import com.wd45.rabbitmq.RabbitMQConsumer;
 import com.wd45.ws.AnswerWS;
 
@@ -19,6 +17,11 @@ public class CPUServlet extends HttpServlet {
 
         AnswerWS answerWS = new AnswerWS();
 
+        RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer();
+        Thread thread = new Thread(rabbitMQConsumer);
+        thread.setDaemon(true);
+        thread.start();
+
         String action = httpServletRequest.getParameter("action");
 
         if(action == null ){
@@ -30,12 +33,7 @@ public class CPUServlet extends HttpServlet {
             httpServletResponse.getWriter().write(answerWS.getBytesToString());
         }
         else if(action.equals("answerWS")){
-            try {
-                httpServletResponse.getWriter().write(
-                        Iterables.getLast(RabbitMQConsumer.getMessages()));
-            } catch (Exception e) {
-
-            }
+            httpServletResponse.getWriter().write(Message.getMessage());
         }
     }
 }
