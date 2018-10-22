@@ -1,27 +1,37 @@
 package com.wd45.servlet;
-import com.wd45.rabbitmq.Message;
+import com.google.common.collect.Iterables;
 import com.wd45.rabbitmq.RabbitMQConsumer;
 import com.wd45.ws.AnswerWS;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/loadCPU")
 public class CPUServlet extends HttpServlet {
+
+    private List<RabbitMQConsumer> rabbitMQConsumers = new ArrayList<>();
+
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException, ServletException {
 
         AnswerWS answerWS = new AnswerWS();
 
-        RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer();
+        String qName = httpServletRequest.getParameter("qname");
+        RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer(qName);
+        RabbitMQConsumer consumer = rabbitMQConsumers.stream()
+                .filter((x) -> x.QNAME == qName)
+                .findFirst()
+                .orElse(null);
 
-        Thread thread = new Thread(rabbitMQConsumer);
-        thread.setDaemon(true);
-        thread.start();
+        if(consumer == null) {
+            rabbitMQConsumers.add(rabbitMQConsumer);
+        }
 
         String action = httpServletRequest.getParameter("action");
 
@@ -34,7 +44,13 @@ public class CPUServlet extends HttpServlet {
             httpServletResponse.getWriter().write(answerWS.getBytesToString());
         }
         else if(action.equals("answerWS")){
-            httpServletResponse.getWriter().write(Message.getMessage());
+            try {
+                if (rabbitMQConsumer.getMessages() != null) {
+                    httpServletResponse.getWriter().write(rabbitMQConsumer.getMessages());
+                }
+            } catch (Exception e) {
+
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.wd45.rabbitmq;
 
+import com.google.common.collect.Iterables;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
@@ -7,12 +8,23 @@ import com.rabbitmq.client.QueueingConsumer;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 
-public  class RabbitMQConsumer  implements Runnable{
+public  class RabbitMQConsumer {
 
-    public  void run ()  {
+    public final String QNAME;
+
+    public RabbitMQConsumer(String queueName){
+        QNAME = queueName;
+    }
+
+    public  String getMessages () throws Exception  {
+
+        String result = "";
+
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername("guest");
         factory.setPassword("guest");
@@ -20,13 +32,13 @@ public  class RabbitMQConsumer  implements Runnable{
         factory.setHost("127.0.0.1");
         factory.setPort(5672);
 
-        Connection conn = null;
+        Connection conn ;
         try {
             conn = factory.newConnection();
-        } catch (Exception ex) {return;}
+        } catch (Exception ex) {return null;}
 
         String exchangeName = "exchangeName";
-        String queueName = "queueName";
+        String queueName = QNAME;
         String routingKey = "routeKey";
 
         Channel channel = null;
@@ -45,14 +57,22 @@ public  class RabbitMQConsumer  implements Runnable{
 
         boolean runInfinite = true;
         while (runInfinite) {
-            QueueingConsumer.Delivery delivery ;
+            QueueingConsumer.Delivery delivery;
             try {
-                delivery = consumer.nextDelivery();
-                Message.setMessage(new String(delivery.getBody()));
+                delivery = consumer.nextDelivery(100);
             } catch (InterruptedException ie) {
+                continue;
+            }
+
+            if (delivery == null){
                 break;
             }
+
+            result = new String(delivery.getBody());
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
+
         }
+
         try {
             channel.close();
             conn.close();
@@ -61,5 +81,6 @@ public  class RabbitMQConsumer  implements Runnable{
         } catch (TimeoutException e) {
 
         }
+        return result;
     }
 }

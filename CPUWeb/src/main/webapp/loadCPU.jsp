@@ -23,11 +23,13 @@
 
 <script>
 
+        var qName= Math.floor(Math.random());
         setInterval(function () {
             $.ajax({
                 url: 'loadCPU',
                 data: {
-                    action: "refresh"
+                    action: "refresh",
+                    qname: qName
                 },
                 success: function (response) {
                     $("#content").attr("src", response);
@@ -37,12 +39,13 @@
             $.ajax({
                 url: 'loadCPU',
                 data: {
-                    action: "answerWS"
+                    action: "answerWS",
+                    qname: qName
                 },
                 success: function (response) {
                     $('<p>'+response+'</p>').appendTo('#answer');
                 }
             });
-        }, 500);
+        }, 1000);
 
 </script>
