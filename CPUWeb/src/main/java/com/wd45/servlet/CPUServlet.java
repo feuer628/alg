@@ -7,7 +7,9 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/loadCPU")
 public class CPUServlet extends HttpServlet {
 
-    private static List<RabbitMQConsumer> rabbitMQConsumers = new ArrayList<>();
+    private static Set<RabbitMQConsumer> rabbitMQConsumers = new HashSet<>();
 
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException, ServletException {
@@ -23,13 +25,14 @@ public class CPUServlet extends HttpServlet {
         AnswerWS answerWS = new AnswerWS();
 
         String qName = httpServletRequest.getParameter("qname");
-        RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer(qName);
+
         RabbitMQConsumer consumer = rabbitMQConsumers.stream()
                 .filter((x) -> x.QNAME == qName)
                 .findFirst()
                 .orElse(null);
 
         if(consumer == null) {
+            RabbitMQConsumer rabbitMQConsumer = new RabbitMQConsumer(qName);
             Thread thread = new Thread(rabbitMQConsumer);
             thread.setDaemon(true);
             thread.start();
