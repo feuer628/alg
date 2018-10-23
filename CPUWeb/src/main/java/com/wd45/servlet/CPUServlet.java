@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/loadCPU")
 public class CPUServlet extends HttpServlet {
 
-    private List<RabbitMQConsumer> rabbitMQConsumers = new ArrayList<>();
+    private static List<RabbitMQConsumer> rabbitMQConsumers = new ArrayList<>();
 
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException, ServletException {
@@ -30,6 +30,9 @@ public class CPUServlet extends HttpServlet {
                 .orElse(null);
 
         if(consumer == null) {
+            Thread thread = new Thread(rabbitMQConsumer);
+            thread.setDaemon(true);
+            thread.start();
             rabbitMQConsumers.add(rabbitMQConsumer);
         }
 
@@ -47,11 +50,11 @@ public class CPUServlet extends HttpServlet {
 
             for (RabbitMQConsumer consumer1: rabbitMQConsumers) {
                 try {
-                    if (consumer1.getMessages() != null && consumer1.QNAME.equals(qName)) {
-                        httpServletResponse.getWriter().write(consumer1.getMessages());
+                    if (consumer1.QNAME.equals(qName)) {
+                        httpServletResponse.getWriter().write(Iterables.getLast(consumer1.message));
                     }
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
             }
         }
