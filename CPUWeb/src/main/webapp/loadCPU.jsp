@@ -22,8 +22,7 @@
 </html>
 
 <script>
-
-        var qName= Math.floor(Math.random());
+        var qName= Math.floor(Math.random()*10000);
         setInterval(function () {
             $.ajax({
                 url: 'loadCPU',

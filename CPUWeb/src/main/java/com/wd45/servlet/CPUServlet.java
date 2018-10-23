@@ -44,12 +44,15 @@ public class CPUServlet extends HttpServlet {
             httpServletResponse.getWriter().write(answerWS.getBytesToString());
         }
         else if(action.equals("answerWS")){
-            try {
-                if (rabbitMQConsumer.getMessages() != null) {
-                    httpServletResponse.getWriter().write(rabbitMQConsumer.getMessages());
-                }
-            } catch (Exception e) {
 
+            for (RabbitMQConsumer consumer1: rabbitMQConsumers) {
+                try {
+                    if (consumer1.getMessages() != null && consumer1.QNAME.equals(qName)) {
+                        httpServletResponse.getWriter().write(consumer1.getMessages());
+                    }
+                } catch (Exception e) {
+
+                }
             }
         }
     }
